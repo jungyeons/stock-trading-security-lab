@@ -1,9 +1,14 @@
 package com.stocklab.config;
 
 import com.stocklab.model.AppUser;
+import com.stocklab.model.OrderSide;
+import com.stocklab.model.Position;
 import com.stocklab.model.Role;
 import com.stocklab.model.Stock;
+import com.stocklab.model.TradeOrder;
+import com.stocklab.repository.PositionRepository;
 import com.stocklab.repository.StockRepository;
+import com.stocklab.repository.TradeOrderRepository;
 import com.stocklab.repository.UserRepository;
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,7 +20,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SeedDataConfig {
     @Bean
-    CommandLineRunner seedData(UserRepository userRepository, StockRepository stockRepository, PasswordEncoder encoder) {
+    CommandLineRunner seedData(
+            UserRepository userRepository,
+            StockRepository stockRepository,
+            PositionRepository positionRepository,
+            TradeOrderRepository tradeOrderRepository,
+            PasswordEncoder encoder
+    ) {
         return args -> {
             if (userRepository.count() == 0) {
                 AppUser user = new AppUser();
@@ -47,6 +58,30 @@ public class SeedDataConfig {
                         create("INTC", "Intel Corp.", "43.16")
                 );
                 stockRepository.saveAll(stocks);
+            }
+
+            if (tradeOrderRepository.count() == 0) {
+                AppUser user = userRepository.findByUsername("user1").orElseThrow();
+                Stock aapl = stockRepository.findBySymbol("AAPL").orElseThrow();
+                BigDecimal qty = BigDecimal.valueOf(3);
+                BigDecimal total = aapl.getCurrentPrice().multiply(qty);
+                user.setCashBalance(user.getCashBalance().subtract(total));
+                TradeOrder order = new TradeOrder();
+                order.setUser(user);
+                order.setStock(aapl);
+                order.setSide(OrderSide.BUY);
+                order.setQuantity(3);
+                order.setExecutedPrice(aapl.getCurrentPrice());
+                order.setTotalAmount(total);
+                tradeOrderRepository.save(order);
+
+                Position p = new Position();
+                p.setUser(user);
+                p.setStock(aapl);
+                p.setQuantity(3);
+                p.setAvgPrice(aapl.getCurrentPrice());
+                positionRepository.save(p);
+                userRepository.save(user);
             }
         };
     }
