@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16
+    container_name: stocklab-db
+    environment:
+      POSTGRES_DB: stocklab
+      POSTGRES_USER: stocklab
+      POSTGRES_PASSWORD: stocklab
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ./infra/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stocklab -d stocklab"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stocklab-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: stocklab
+      DB_USER: stocklab
+      DB_PASSWORD: stocklab
+      JWT_SECRET: replace-this-in-real-world-lab-only-secret-key-123456
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: stocklab-frontend
+    depends_on:
+      - backend
+    ports:
+      - "127.0.0.1:5173:5173"
