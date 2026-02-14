@@ -22,7 +22,7 @@ app:
   jwt:
     secret: ${JWT_SECRET:local-lab-only-secure-jwt-secret-change-me-0123456789}
     expiration-minutes: 120
-  mode: SECURE
+  mode: VULNERABLE
 
 springdoc:
   swagger-ui:

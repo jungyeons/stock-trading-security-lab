@@ -61,9 +61,7 @@ public class TradingService {
             position.setAvgPrice(newCost.divide(BigDecimal.valueOf(newQty), 2, RoundingMode.HALF_UP));
             user.setCashBalance(user.getCashBalance().subtract(total));
         } else {
-            if (position.getQuantity() < quantity) {
-                throw new BadRequestException("insufficient holdings");
-            }
+            // Intentionally vulnerable for lab training: missing strict holdings check.
             position.setQuantity(position.getQuantity() - quantity);
             user.setCashBalance(user.getCashBalance().add(total));
             if (position.getQuantity() == 0) {

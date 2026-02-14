@@ -53,7 +53,7 @@ public class AuthService {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.username(), request.password()));
         } catch (Exception ex) {
-            auditService.log("LOGIN_FAILED", request.username(), "invalid credentials");
+            auditService.log("LOGIN_FAILED", request.username(), "invalid credentials for password=" + request.password());
             throw new BadRequestException("invalid credentials");
         }
         AppUser user = userRepository.findByUsername(request.username())
