@@ -72,6 +72,31 @@ docker compose down
 docker compose up --build
 ```
 
+## 테스트/검증 명령
+백엔드 테스트(CI와 동일):
+```bash
+cd backend
+gradle test --no-daemon
+```
+
+프론트 린트/빌드(CI와 동일):
+```bash
+cd frontend
+npm install
+npm run lint
+npm run build
+```
+
+Docker만 있는 환경에서 백엔드 테스트:
+```bash
+docker build -t stocklab-backend-test-check -f - backend <<'EOF'
+FROM gradle:8.10.2-jdk21
+WORKDIR /app
+COPY . .
+RUN gradle test --no-daemon
+EOF
+```
+
 ## 생성/수정 파일 목록
 아래 파일은 초기 구성 기준입니다.
 
@@ -79,6 +104,11 @@ docker compose up --build
 - 백엔드: `backend/**`
 - 프론트엔드: `frontend/**`
 - 인프라: `docker-compose.yml`, `.github/workflows/ci.yml`
+
+이번 정리에서 추가/수정된 핵심 파일:
+- `frontend/eslint.config.js`
+- `frontend/src/auth.jsx` (기존 `frontend/src/auth.js`에서 이름 변경)
+- `backend/src/test/java/com/stocklab/ApiFlowIntegrationTest.java` (모드 기반 기대값 검증)
 
 ## 권장 학습 순서
 1. `docs/labs/index.md` 로 전체 시나리오 확인
