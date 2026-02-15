@@ -1,0 +1,29 @@
+server:
+  port: 8080
+  address: 127.0.0.1
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stocklab
+    username: stocklab
+    password: stocklab
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:local-lab-only-secure-jwt-secret-change-me-0123456789}
+    expiration-minutes: 120
+  mode: VULNERABLE
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
