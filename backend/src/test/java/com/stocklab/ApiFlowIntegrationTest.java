@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -72,9 +73,16 @@ class ApiFlowIntegrationTest {
     @Test
     void userCannotAccessAdminEndpoint() throws Exception {
         String token = login("user1", "User1234!");
+        MvcResult modeResult = mockMvc.perform(get("/api/meta/mode"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String mode = objectMapper.readTree(modeResult.getResponse().getContentAsString()).get("mode").asText();
+        ResultMatcher expected = "VULNERABLE".equalsIgnoreCase(mode)
+                ? status().isOk()
+                : status().isForbidden();
         mockMvc.perform(get("/api/admin/users")
                         .header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden());
+                .andExpect(expected);
     }
 
     @Test
