@@ -9,6 +9,7 @@
 - `secure` 브랜치 기준으로 먼저 안전한 구현과 테스트를 제안합니다.
 - `vulnerable` 브랜치에는 학습에 필요한 최소 취약점만 의도적으로 반영합니다.
 - 모든 보안 관련 변경은 문서(`docs/labs`, `docs/diffs`)를 함께 갱신합니다.
+- `backend/.gradle`, `backend/build`, `frontend/node_modules`, `frontend/dist` 같은 로컬 캐시와 빌드 산출물은 커밋하지 않습니다.
 
 ## 커밋 규칙
 - 작은 단위로 나눠 커밋합니다.
